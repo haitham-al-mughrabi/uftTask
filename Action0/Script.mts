@@ -2,4 +2,5 @@
 RunAction "Set Dispatcher And Distention", oneIteration
 RunAction "SetTripProperties", oneIteration
 RunAction "Set Depature and Return Dates", oneIteration
-RunAction "Validate Booking Data", oneIteration
+RunAction "Search For Flights", oneIteration
+RunAction "Select Departing and Return Flights", oneIteration

@@ -16,7 +16,8 @@ Open Google Flights=Action1\Script.mts
 Set Dispatcher And Distention=Action2\Script.mts
 SetTripProperties=Action3\Script.mts
 Set Depature and Return Dates=Action4\Script.mts
-Validate Booking Data=Action5\Script.mts
+Search For Flights=Action5\Script.mts
+Select Departing and Return Flights=Action6\Script.mts
 
 [VuserProfiles]
 Profiles=Default Profile
@@ -74,3 +75,6 @@ Action4\ObjectRepository.bdb=
 Action5\Script.mts=
 Action5\Resource.mtr=
 Action5\ObjectRepository.bdb=
+Action6\Script.mts=
+Action6\Resource.mtr=
+Action6\ObjectRepository.bdb=
