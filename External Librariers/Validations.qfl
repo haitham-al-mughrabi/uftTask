@@ -1,0 +1,23 @@
+﻿Function ValidateTextValue(elementXpathExpression, expectedText,  valueWrapper)
+    ' Capture the actual text value from the application
+    Dim actualText
+    If  valueWrapper = "text" Then
+    	actualText = Browser("Google Flights").Page("Google Flights").WebElement("xpath:=" & elementXpathExpression).GetROProperty("text")
+    ElseIf valueWrapper = "data-value" Then
+    	actualText = objPage.RunScript("document.evaluate('" & elementXpathExpression & "', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.getAttribute('" & valueWrapper & "');")
+    Else 
+        	actualText = Browser("Google Flights").Page("Google Flights").WebElement("xpath:=" & elementXpathExpression).GetROProperty(valueWrapper)
+    End If
+    
+	
+    ' Compare the actual text with the expected text
+    If actualText = expectedText Then
+        Reporter.ReportEvent micPass, "Text Validation", "Text is as expected."
+        ValidateTextValue = True
+    Else
+        Reporter.ReportEvent micFail, "Text Validation", "Expected: " & expectedText & ", but found: " & actualText
+        ValidateTextValue = False
+    End If
+End Function
+
+

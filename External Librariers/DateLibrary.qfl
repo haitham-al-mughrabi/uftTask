@@ -1,0 +1,186 @@
+﻿Function setDepatureAndReturnDates(depatureDateObject, returnDateObject)
+    ' Convert string dates to Date data types and compare
+    If CDate(depatureDateObject("currentDate")) <= CDate(returnDateObject("currentDate")) Then
+        For activeMonthWrapperID = 1 To 12 Step 1
+            activeMonthName = "(//div[@data-snap-point='1']/div[@role='rowgroup'])["&activeMonthWrapperID&"]/div[1]"
+            activeMonthNameValue = Browser("Google Flights").Page("Google Flights").WebElement("xpath:=" & activeMonthName).GetROProperty("text")
+            If depatureDateObject("monthName") = activeMonthNameValue Then
+                formattedDepatureDay = dayNumberFormatter(depatureDateObject("day"))
+                formattedDepatureMonth = monthNumberFormatter(depatureDateObject("month"))
+                locatorFormattedDate = depatureDateObject("year") & "-" & formattedDepatureMonth & "-" & formattedDepatureDay
+                depatureDayXpathExpression = "//div[@data-iso='" & locatorFormattedDate & "']"
+                Set objElement = Browser("Google Flights").Page("Google Flights").WebElement("xpath:=" & depatureDayXpathExpression)
+                objElement.Click
+                Exit For
+            ElseIf activeMonthWrapperID mod 2 = 0 Then
+                Browser("Google Flights").Page("Google Flights").WebElement("Move To Next Months View").Click
+            End If
+        Next
+        print "departure date set"
+        
+        For activeMonthWrapperID = 1 To 12 Step 1
+            activeMonthName = "(//div[@data-snap-point='1']/div[@role='rowgroup'])["&activeMonthWrapperID&"]/div[1]"
+            activeMonthNameValue = Browser("Google Flights").Page("Google Flights").WebElement("xpath:=" & activeMonthName).GetROProperty("text")
+            If returnDateObject("monthName") = activeMonthNameValue Then
+                formattedReturnDay = dayNumberFormatter(returnDateObject("day"))
+                formattedReturnMonth = monthNumberFormatter(returnDateObject("month"))
+                locatorFormattedDate = returnDateObject("year") & "-" & formattedReturnMonth & "-" & formattedReturnDay
+                returnDayXpathExpression = "//div[@data-iso='" & locatorFormattedDate & "']"
+                Set objElement = Browser("Google Flights").Page("Google Flights").WebElement("xpath:=" & returnDayXpathExpression)
+                objElement.Click
+                Exit For
+            ElseIf activeMonthWrapperID mod 2 = 0 Then
+                Browser("Google Flights").Page("Google Flights").WebElement("Move To Next Months View").Click
+            End If
+            print "looped here"
+        Next
+        print "return date set"
+    Else
+        print("Return date is less than the Departure date.")
+        Reporter.ReportEvent micFail, "Date Value Validation", "Return date is less than the Departure date."
+        ExitTest
+    End If
+End Function
+
+Function getCurrentDate()
+	Set dict = CreateObject("Scripting.Dictionary")
+	currentDate = Date
+	currentDate = FormatDateTime(currentDate, 2)
+	' Extract day, month, and year
+	currentDay = Day(currentDate)
+	currentMonth = Month(currentDate)
+	currentMonthAsName = monthNumberToName(currentMonth)
+	currentYear = Year(currentDate)
+	' Store day, month, and year values		
+	dict.Add "day", currentDay
+	dict.Add "month", currentMonth
+	dict.Add "year", currentYear
+	dict.Add "monthName", currentMonthAsName
+	dict.Add "currentDate", CStr(currentDay) & "/" & CStr(currentMonth) & "/" & CStr(currentYear)
+	Set getCurrentDate = dict ' Use Set to assign the object
+End Function
+
+Function checkGivenDateUsability(givenDay, givenMonth, givenYear)
+    Set currentDate = getCurrentDate()
+    ' Convert given month name to number
+    givenMonthNum = monthNameToNumber(givenMonth)
+    If givenMonthNum = 0 Then
+        Reporter.ReportEvent micFail, "Date Value Validation", "Given month does not match any Georgian month."
+        Exit Function
+    End If
+
+    ' Create Date values for comparison
+    givenDate = DateSerial(givenYear, givenMonthNum, givenDay)
+    currentDate = DateSerial(currentDate("year"), currentDate("month"), currentDate("day"))
+
+    ' Compare the dates
+    If givenDate >= currentDate Then
+        print("Given date is greater than or equal to the current date.")
+    Else
+        print("Given date is less than the current date.")
+        Reporter.ReportEvent micFail, "Date Value Validation", "Given date is less than the current date."
+        ExitTest
+    End If
+End Function
+
+
+Function monthNameToNumber(monthName)
+    Select Case LCase(monthName)
+        Case "january": monthNameToNumber = 1
+        Case "february": monthNameToNumber = 2
+        Case "march": monthNameToNumber = 3
+        Case "april": monthNameToNumber = 4
+        Case "may": monthNameToNumber = 5
+        Case "june": monthNameToNumber = 6
+        Case "july": monthNameToNumber = 7
+        Case "august": monthNameToNumber = 8
+        Case "september": monthNameToNumber = 9
+        Case "october": monthNameToNumber = 10
+        Case "november": monthNameToNumber = 11
+        Case "december": monthNameToNumber = 12
+        Case Else: monthNameToNumber = 0 ' Invalid month name
+    End Select
+End Function
+
+Function monthNumberToName(monthNumber)
+    Select Case LCase(monthNumber)
+        Case 1: monthNumberToName = "January"
+        Case 2: monthNumberToName = "February"
+        Case 3: monthNumberToName = "March"
+        Case 4: monthNumberToName = "April"
+        Case 5: monthNumberToName = "May"
+        Case 6: monthNumberToName = "June"
+        Case 7: monthNumberToName = "July"
+        Case 8: monthNumberToName = "August"
+        Case 9: monthNumberToName = "September"
+        Case 10: monthNumberToName = "October"
+        Case 11: monthNumberToName = "November"
+        Case 12: monthNumberToName = "December"
+        Case Else: monthNameToNumber = 0 ' Invalid month name
+    End Select
+End Function
+
+Function reformatDate(givenDate, givenDelemeter, targetDelemeter, reverse)
+	reformatDate = Replace(givenDate, givenDelemeter, targetDelemeter)
+End Function
+
+Function monthNumberFormatter(monthAsNumber)
+	If monthAsNumber>=1 and monthAsNumber<=9 Then
+		monthNumberFormatter = "0"&CStr(monthAsNumber)
+	ElseIf monthAsNumber<1 or monthAsNumber>12 Then
+		print("Given value is incorrect month value")
+	       Reporter.ReportEvent micFail, "Month Value Validation", "Given value is incorrect month value"
+	       ExitTest
+	ElseIf monthAsNumber>9 and monthAsNumber<=12 Then
+		monthNumberFormatter = CStr(monthAsNumber)
+	End If
+End Function
+
+Function dayNumberFormatter(dayAsNumber)
+	If dayAsNumber>=1 and dayAsNumber<=9 Then
+		dayNumberFormatter = "0"&CStr(dayAsNumber)
+	ElseIf dayAsNumber<1 or dayAsNumber>31 Then
+		print("Given value is incorrect day value")
+	       Reporter.ReportEvent micFail, "Day Value Validation", "Given value is incorrect day value"
+	       ExitTest
+	ElseIf dayAsNumber>9 and dayAsNumber<=31 Then
+		dayNumberFormatter = CStr(dayAsNumber)
+	End If
+End Function
+
+Function modifyDate(inputDateStr, x)
+    Set dict = CreateObject("Scripting.Dictionary")
+    
+    ' Convert string date to VBScript Date variant
+    inputDate = CDate(inputDateStr)
+    
+    ' Add or subtract x days
+    modifiedDate = DateAdd("d", x, inputDate)
+    formattedDate = FormatDateTime(modifiedDate, 2)
+    
+    ' Extract day, month, and year
+    currentDay = Day(formattedDate)
+    currentMonth = Month(formattedDate)
+    currentMonthAsName = monthNumberToName(currentMonth)
+    currentYear = Year(formattedDate)
+    
+    ' Store day, month, and year values		
+    dict.Add "day", currentDay
+    dict.Add "month", currentMonth
+    dict.Add "year", currentYear
+    dict.Add "monthName", currentMonthAsName
+    dict.Add "currentDate", CStr(currentDay) & "/" & CStr(currentMonth) & "/" & CStr(currentYear)
+    
+    Set modifyDate = dict ' Use Set to assign the object
+End Function
+
+Function createDateObject(givenDay, givenMonth, givenYear)
+	Set dict = CreateObject("Scripting.Dictionary")
+	currentMonthAsName = monthNumberToName(currentMonth)
+	dict.Add "day", givenDay
+	dict.Add "month", givenMonth
+	dict.Add "year", givenYear
+	dict.Add "monthName", currentMonthAsName
+	dict.Add "currentDate", CStr(givenDay) & "/" & CStr(givenMonth) & "/" & CStr(givenYear)
+	Set createDateObject = dict
+End Function

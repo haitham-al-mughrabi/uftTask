@@ -1,0 +1,49 @@
+﻿Function pickCityAirport(airportName)
+	xpathExpression = "(//li[@role='option' and contains(@aria-label,'" & airportName & "')])[1]"
+	Set objElement = Browser("Google Flights").Page("Google Flights").WebElement("xpath:=" & xpathExpression)
+	objElement.Click
+End Function
+
+
+Function pickMainAirportByCityName(cityName)
+ 	xpathExpression = "(//li[@role='option' and contains(@aria-label,'" & cityName & "')])[1]"
+	Set objElement = Browser("Google Flights").Page("Google Flights").WebElement("xpath:=" & xpathExpression)
+	objElement.Click
+End Function
+
+Function selectTripType(tripType)
+ 	xpathExpression = "(//li[@role='option' and span/span[contains(text(),'"& tripType &"')]])[1]"
+	Set objElement = Browser("Google Flights").Page("Google Flights").WebElement("xpath:=" & xpathExpression)
+	objElement.Click
+End Function
+
+Function selectNumberOfPassengers(passengerType, extraText, numberOfPassengers)
+	'Setup Locators
+	If extraText <> "" Then
+	    passengerTypeWapper = "//label[contains(text(),'" & passengerType & "') and span[contains(text(),'" & extraText & "')]]"
+	ElseIf extraText = "" Then
+	    passengerTypeWapper = "//label[contains(text(),'" & passengerType & "')]"
+	End If
+	decrementButton = passengerTypeWapper&"/following-sibling::div/div/span[1]/button"
+	incrementButton = passengerTypeWapper&"/following-sibling::div/div/span[3]/button"
+	currentNumberOfPassenger = passengerTypeWapper&"/following-sibling::div/div/span[2]/span[1]"
+	'Get current number of passengers
+	currentNumberOfPassengerValue =  int (Browser("Google Flights").Page("Google Flights").WebElement("xpath:=" & currentNumberOfPassenger).GetROProperty("text"))
+	Do While currentNumberOfPassengerValue<>numberOfPassengers
+		If currentNumberOfPassengerValue<numberOfPassengers Then 
+		'incriment number of passengers
+			Browser("Google Flights").Page("Google Flights").WebElement("xpath:=" & incrementButton).Click
+		ElseIf currentNumberOfPassengerValue>numberOfPassengers Then 
+'			decrease number of passengers
+			Browser("Google Flights").Page("Google Flights").WebElement("xpath:=" & decrementButton).Click
+		End If
+	 	currentNumberOfPassengerValue =  int (Browser("Google Flights").Page("Google Flights").WebElement("xpath:=" & currentNumberOfPassenger).GetROProperty("text"))
+	Loop
+End Function
+
+Function selectTripClass(tripClass)
+	xpathExpression = "(//li[@role='option' and span/span[contains(text(),'"& tripClass &"')]])[1]"
+	Set objElement = Browser("Google Flights").Page("Google Flights").WebElement("xpath:=" & xpathExpression)
+	objElement.Click
+End Function
+
