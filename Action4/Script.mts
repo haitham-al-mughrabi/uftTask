@@ -1,10 +1,16 @@
 ﻿Browser("Google Flights").Page("Google Flights").WebElement("DepatureDate").Click
- @@ script infofile_;_ZIP::ssf2.xml_;_
-Set currentDateObject = getCurrentDate()
 
-Set incrementedDateObject = modifyDate (currentDateObject("currentDate"),30)
+Dim depatureDateValuesObject, returnDateValuesObject, dateStr, daysToAdd
 
-setDepatureAndReturnDates currentDateObject, incrementedDateObject
+set depatureDateValuesObject = getCurrentDate() 
+
+dateStr = depatureDateValuesObject("currentDate")
+
+daysToAdd = 30
+
+set returnDateValuesObject = modifyDate(dateStr, daysToAdd)
+
+setDepatureAndReturnDates depatureDateValuesObject, returnDateValuesObject
 
 Browser("Google Flights").Page("Google Flights").WebElement("Click Done").Click
 

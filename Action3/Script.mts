@@ -1,21 +1,30 @@
-﻿Browser("Google Flights").Page("Google Flights").WebElement("Trip Type Select Field").Click
+﻿Dim numberOfAdultsPassengers, numberOfChildrenPassengers, numberOfInSeatInfantsPassengers, numberOfOnLapInfantsPassengers, tripClass,tripType
 
-selectTripType "Round trip"
+numberOfAdultsPassengers = 3
+numberOfChildrenPassengers = 3
+numberOfInSeatInfantsPassengers = 1
+numberOfOnLapInfantsPassengers = 1
+tripClass = "Economy"
+tripType = "Round trip"
+
+Browser("Google Flights").Page("Google Flights").WebElement("Trip Type Select Field").Click
+
+selectTripType tripType
 
 wait 2
 
 Browser("Google Flights").Page("Google Flights").WebElement("Passengers Numbers Select Field").Click
 
-selectNumberOfPassengers "Adults", "", 3
+selectNumberOfPassengers "Adults", "", numberOfAdultsPassengers
 
-selectNumberOfPassengers "Children", "", 3
+selectNumberOfPassengers "Children", "", numberOfChildrenPassengers
 
-selectNumberOfPassengers "Infants", "In seat", 1
+selectNumberOfPassengers "Infants", "In seat", numberOfInSeatInfantsPassengers
 
-selectNumberOfPassengers "Infants", "On lap", 1
+selectNumberOfPassengers "Infants", "On lap", numberOfOnLapInfantsPassengers
 
 wait 2
 
 Browser("Google Flights").Page("Google Flights").WebElement("Trip Class Select Field").Click
 
-selectTripClass "First"
+selectTripClass tripClass 
